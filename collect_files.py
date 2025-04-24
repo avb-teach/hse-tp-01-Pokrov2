@@ -36,7 +36,7 @@ def do_copy(in_dir, out_dir, max_depth=None):
 in_dir = sys.argv[1]
 out_dir = sys.argv[2]
 max_depth = None
-
+n = 0
 if "--max_depth" in sys.argv:
     idx = sys.argv.index("--max_depth")
     max_depth = int(sys.argv[idx + 1])
