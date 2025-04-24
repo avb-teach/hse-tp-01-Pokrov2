@@ -7,42 +7,34 @@ def do_copy(in_dir, out_dir, max_depth=None):
     if not os.path.exists(in_dir):
         sys.exit(1)
     os.makedirs(out_dir, exist_ok=True)
-    names = {}
+
+    seen = {}
 
     for root, dirs, files in os.walk(in_dir):
-        rel_path = os.path.relpath(root, in_dir)
-        dirs.sort()
-        files.sort()
-        if rel_path == ".":
-            depth = 0
-        else:
-            rel_path.count(os.sep) + 1
+        rel = os.path.relpath(root, in_dir)
+        depth = 0 if rel == "." else rel.count(os.sep) + 1
 
-        if max_depth is not None and depth > max_depth:
+        if max_depth is not None and depth >= max_depth:
             dirs[:] = []
-            continue
 
-        dst_dir = os.path.join(out_dir, rel_path)
-        os.makedirs(dst_dir, exist_ok=True)
+        dest_dir = os.path.join(out_dir, rel) if rel != "." else out_dir
+        os.makedirs(dest_dir, exist_ok=True)
 
-        for name in files:
-            src_path = os.path.join(root, name)
+        for f in sorted(files):
+            if max_depth is not None and depth > max_depth:
+                continue
 
-            key = os.path.join(rel_path, name)
-            if key in names:
-                names[key] += 1
-                count = names[key] - 1
-                dot = name.rfind(".")
-                if dot != -1:
-                    new_name = name[:dot] + "_" + str(count) + name[dot:]
-                else:
-                    new_name = name + "_" + str(count)
-            else:
-                names[key] = 1
-                new_name = name
+            src = os.path.join(root, f)
+            dst = os.path.join(dest_dir, f)
 
-            dst_path = os.path.join(dst_dir, new_name)
-            shutil.copy2(src_path, dst_path)
+            base, ext = os.path.splitext(f)
+            suffix = 1
+
+            while os.path.exists(dst):
+                dst = os.path.join(dest_dir, f"{base}_{suffix}{ext}")
+                suffix += 1
+
+            shutil.copy2(src, dst)
 
 
 in_dir = sys.argv[1]
