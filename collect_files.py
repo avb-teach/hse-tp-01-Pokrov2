@@ -30,8 +30,8 @@ def do_copy(in_dir, out_dir, max_depth=None):
 
             key = name
             if key in names:
-                count = names[key]
                 names[key] += 1
+                count = names[key] - 1
                 dot = name.rfind(".")
                 if dot != -1:
                     new_name = name[:dot] + "_" + str(count) + name[dot:]
