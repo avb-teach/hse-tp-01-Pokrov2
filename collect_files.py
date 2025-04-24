@@ -8,21 +8,30 @@ def do_copy(in_dir, out_dir, max_depth=None):
         sys.exit(1)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
-
+    names = {}
     for curr_root, folders, files in os.walk(in_dir):
         rel_path = os.path.relpath(curr_root, in_dir)
-        depth = rel_path.count(os.sep)
+        depth = 0 if rel_path == "." else rel_path.count(os.sep) + 1
 
-        if max_depth is not None and depth >= max_depth:
+        if max_depth is not None and depth > max_depth:
             folders[:] = []
-
-        target_dir = os.path.join(out_dir, rel_path)
-        os.makedirs(target_dir, exist_ok=True)
+            continue
 
         for f in files:
-            src_path = os.path.join(curr_root, f)
-            dst_path = os.path.join(target_dir, f)
-            shutil.copy2(src_path, dst_path)
+            orig_path = os.path.join(curr_root, f)
+
+            if f in names:
+                names[f] += 1
+                dot = f.rfind(".")
+                if dot != -1:
+                    new_name = f[:dot] + f"_" + str(names[f]) + f[dot:]
+                else:
+                    new_name = f + "_" + str(names[f])
+            else:
+                names[f] = 1
+                new_name = f
+            final_path = os.path.join(out_dir, new_name)
+            shutil.copy2(orig_path, final_path)
 
 
 in_dir = sys.argv[1]
