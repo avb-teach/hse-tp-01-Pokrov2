@@ -22,9 +22,6 @@ def do_copy(in_dir, out_dir, max_depth=None):
             folders[:] = []
             continue
 
-        if max_depth is not None and depth > max_depth:
-            continue
-
         for f in files:
             orig_path = os.path.join(curr_root, f)
 
