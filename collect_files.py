@@ -4,51 +4,51 @@ import shutil
 
 
 def do_copy(in_dir, out_dir, max_depth=None):
-    if not os.path.exists(in_dir):
-        sys.exit(1)
+    if not os.path.isdir(in_dir):
+        sys.exit("No input directory")
+
     os.makedirs(out_dir, exist_ok=True)
-
-    names = {}
-
+    used_names = {}
     for root, dirs, files in os.walk(in_dir):
-        rel_path = os.path.relpath(root, in_dir)
-        depth = 0 if rel_path == "." else rel_path.count(os.sep) + 1
-
+        rel = os.path.relpath(root, in_dir)
+        depth = 0 if rel == "." else rel.count(os.sep) + 1
         if max_depth is not None and depth >= max_depth:
             dirs[:] = []
 
-        target_dirs = []
+        targets = []
 
         if max_depth is None or depth <= max_depth:
-            target_dirs.append(os.path.join(out_dir, rel_path))
+            targets.append(os.path.join(out_dir, rel))
 
         if max_depth is not None and depth > max_depth:
-            parts = rel_path.split(os.sep)
-            trimmed = os.sep.join(parts[:max_depth])
-            target_dirs.append(os.path.join(out_dir, trimmed))
+            limited_parts = rel.split(os.sep)[:max_depth]
+            limited_path = os.path.join(out_dir, *limited_parts)
+            targets.append(limited_path)
 
-        for target in target_dirs:
-            os.makedirs(target, exist_ok=True)
+        for tdir in targets:
+            os.makedirs(tdir, exist_ok=True)
 
-        for name in files:
-            src = os.path.join(root, name)
+        for file in files:
+            src_path = os.path.join(root, file)
 
-            for target in target_dirs:
-                dst = os.path.join(target, name)
-                base, ext = os.path.splitext(name)
-                i = 1
-                while os.path.exists(dst):
-                    dst = os.path.join(target, f"{base}_{i}{ext}")
-                    i += 1
-                shutil.copy2(src, dst)
+            for tdir in targets:
+                dst_path = os.path.join(tdir, file)
+                name, ext = os.path.splitext(file)
+                count = 1
+                while dst_path in used_names.values() or os.path.exists(dst_path):
+                    dst_path = os.path.join(tdir, f"{name}_{count}{ext}")
+                    count += 1
+                used_names[(tdir, file)] = dst_path
+                shutil.copy2(src_path, dst_path)
 
 
-in_dir = sys.argv[1]
-out_dir = sys.argv[2]
-max_depth = None
+if __name__ == "__main__":
+    in_dir = sys.argv[1]
+    out_dir = sys.argv[2]
+    max_depth = None
 
-if "--max_depth" in sys.argv:
-    idx = sys.argv.index("--max_depth")
-    max_depth = int(sys.argv[idx + 1])
+    if "--max_depth" in sys.argv:
+        idx = sys.argv.index("--max_depth")
+        max_depth = int(sys.argv[idx + 1])
 
-do_copy(in_dir, out_dir, max_depth)
+    do_copy(in_dir, out_dir, max_depth)
