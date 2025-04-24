@@ -26,15 +26,17 @@ def do_copy(in_dir, out_dir, max_depth=None):
         for name in files:
             src_path = os.path.join(root, name)
 
-            if name in names:
-                names[name] += 1
+            key = name
+            if key in names:
+                count = names[key]
+                names[key] += 1
                 dot = name.rfind(".")
                 if dot != -1:
-                    new_name = name[:dot] + "_" + str(names[name]) + name[dot:]
+                    new_name = name[:dot] + "_" + str(count) + name[dot:]
                 else:
-                    new_name = name + "_" + str(names[name])
+                    new_name = name + "_" + str(count)
             else:
-                names[name] = 1
+                names[key] = 1
                 new_name = name
 
             dst_path = os.path.join(dst_dir, new_name)
