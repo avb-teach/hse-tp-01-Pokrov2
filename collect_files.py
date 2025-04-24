@@ -13,15 +13,16 @@ def do_copy(in_dir, out_dir, max_depth=None):
         rel_path = os.path.relpath(root, in_dir)
         dirs.sort()
         files.sort()
-        depth = 0 if rel_path == "." else rel_path.count(os.sep) + 1
+        if rel_path == ".":
+            depth = 0
+        else:
+            depth = rel_path.count(os.sep) + 1
 
         if max_depth is not None and depth > max_depth:
             dirs[:] = []
 
-        # Вычисляем, куда положить файлы
         if max_depth is not None and depth > max_depth:
-            rel_for_files = os.path.relpath(root, in_dir)
-            rel_for_files = os.path.sep.join(rel_for_files.split(os.sep)[:max_depth])
+            rel_for_files = os.path.sep.join(rel_path.split(os.sep)[:max_depth])
         else:
             rel_for_files = rel_path
 
