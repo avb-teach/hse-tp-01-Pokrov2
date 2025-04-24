@@ -28,7 +28,7 @@ def do_copy(in_dir, out_dir, max_depth=None):
         for name in files:
             src_path = os.path.join(root, name)
 
-            key = name
+            key = os.path.join(rel_path, name)
             if key in names:
                 names[key] += 1
                 count = names[key] - 1
