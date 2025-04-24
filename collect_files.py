@@ -11,6 +11,8 @@ def do_copy(in_dir, out_dir, max_depth=None):
 
     for root, dirs, files in os.walk(in_dir):
         rel_path = os.path.relpath(root, in_dir)
+        dirs.sort()
+        files.sort()
         if rel_path == ".":
             depth = 0
         else:
