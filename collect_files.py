@@ -16,7 +16,7 @@ def do_copy(in_dir, out_dir, max_depth=None):
         if rel_path == ".":
             depth = 0
         else:
-            rel_path.count(os.sep) + 1
+            depth = rel_path.count(os.sep) + 1
 
         if max_depth is not None and depth > max_depth:
             folders[:] = []
