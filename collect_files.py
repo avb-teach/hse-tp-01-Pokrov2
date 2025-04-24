@@ -2,7 +2,6 @@ import os
 import sys
 import shutil
 
-
 def do_copy(in_dir, out_dir, max_depth=None):
     if not os.path.exists(in_dir):
         sys.exit(1)
@@ -23,9 +22,6 @@ def do_copy(in_dir, out_dir, max_depth=None):
         if max_depth is not None and depth > max_depth:
             continue
 
-        dst_dir = os.path.join(out_dir, rel_path)
-        os.makedirs(dst_dir, exist_ok=True)
-
         for f in files:
             orig_path = os.path.join(curr_root, f)
             if f in names:
@@ -38,9 +34,8 @@ def do_copy(in_dir, out_dir, max_depth=None):
             else:
                 names[f] = 1
                 new_name = f
-            final_path = os.path.join(dst_dir, new_name)
+            final_path = os.path.join(out_dir, new_name)
             shutil.copy(orig_path, final_path)
-
 
 in_dir = sys.argv[1]
 out_dir = sys.argv[2]
