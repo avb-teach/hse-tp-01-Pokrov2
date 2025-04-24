@@ -4,6 +4,11 @@ import shutil
 
 
 def do_copy(in_dir, out_dir, max_depth=None):
+    if not os.path.exists(in_dir):
+        sys.exit(1)
+    os.makedirs(out_dir, exist_ok=True)
+
+    names = {}
 
     for root, dirs, files in os.walk(in_dir):
         rel_path = os.path.relpath(root, in_dir)
@@ -12,26 +17,30 @@ def do_copy(in_dir, out_dir, max_depth=None):
         if max_depth is not None and depth >= max_depth:
             dirs[:] = []
 
-        for f in files:
-            src_path = os.path.join(root, f)
+        target_dirs = []
 
-            if max_depth is not None and depth >= max_depth:
-                limited_path = os.path.join(*rel_path.split(os.sep)[:max_depth])
-            else:
-                limited_path = rel_path
+        if max_depth is None or depth <= max_depth:
+            target_dirs.append(os.path.join(out_dir, rel_path))
 
-            dst_dir = os.path.join(out_dir, limited_path)
-            os.makedirs(dst_dir, exist_ok=True)
+        if max_depth is not None and depth > max_depth:
+            parts = rel_path.split(os.sep)
+            trimmed = os.sep.join(parts[:max_depth])
+            target_dirs.append(os.path.join(out_dir, trimmed))
 
-            dst_path = os.path.join(dst_dir, f)
-            name, ext = os.path.splitext(f)
-            count = 1
+        for target in target_dirs:
+            os.makedirs(target, exist_ok=True)
 
-            while os.path.exists(dst_path):
-                dst_path = os.path.join(dst_dir, f"{name}_{count}{ext}")
-                count += 1
+        for name in files:
+            src = os.path.join(root, name)
 
-            shutil.copy2(src_path, dst_path)
+            for target in target_dirs:
+                dst = os.path.join(target, name)
+                base, ext = os.path.splitext(name)
+                i = 1
+                while os.path.exists(dst):
+                    dst = os.path.join(target, f"{base}_{i}{ext}")
+                    i += 1
+                shutil.copy2(src, dst)
 
 
 in_dir = sys.argv[1]
