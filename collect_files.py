@@ -16,8 +16,11 @@ def do_copy(in_dir, out_dir, max_depth=None):
         if max_depth is not None and depth >= max_depth:
             dirs.clear()
 
-        if max_depth is not None and depth > max_depth:
-            cut_path = os.path.join(*rel_path.split(os.sep)[:max_depth])
+        if max_depth is not None:
+            cut_part = rel_path.split(os.sep)[:max_depth]
+            if cut_part:
+                cut_path = os.path.join(*cut_part)  
+            else: cut_path = "."
         else:
             cut_path = rel_path
         if cut_path != ".":
