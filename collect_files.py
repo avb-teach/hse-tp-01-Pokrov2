@@ -11,17 +11,19 @@ def do_copy(in_dir, out_dir, max_depth=None):
         if rel_path == ".":
             depth = 0
         else:
-            rel_path.count(os.sep) + 1
+            depth = rel_path.count(os.sep) + 1
 
         if max_depth is not None and depth >= max_depth:
-            dirs.copy()
+            dirs.clear()
 
         if max_depth is not None and depth > max_depth:
             cut_path = os.path.join(*rel_path.split(os.sep)[:max_depth])
         else:
             cut_path = rel_path
-
-        dst_dir = os.path.join(out_dir, cut_path) if cut_path != "." else out_dir
+        if cut_path != ".":
+            dst_dir = os.path.join(out_dir, cut_path)
+        else:
+            dst_dir = out_dir
         os.makedirs(dst_dir, exist_ok=True)
 
         for file in sorted(files):
@@ -36,13 +38,13 @@ def do_copy(in_dir, out_dir, max_depth=None):
 
             shutil.copy2(src_path, dst_path)
 
+        
+
 
 in_dir = sys.argv[1]
 out_dir = sys.argv[2]
 max_depth = None
-
 if "--max_depth" in sys.argv:
     idx = sys.argv.index("--max_depth")
     max_depth = int(sys.argv[idx + 1])
-
 do_copy(in_dir, out_dir, max_depth)
