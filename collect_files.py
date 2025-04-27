@@ -12,10 +12,6 @@ def do_copy(in_dir, out_dir, max_depth=None):
             depth = 0
         else:
             depth = rel_path.count(os.sep) + 1
-
-        if max_depth is not None and depth >= max_depth:
-            dirs.clear()
-
         if max_depth is not None:
             cut_part = rel_path.split(os.sep)[:max_depth]
             if cut_part:
@@ -40,8 +36,8 @@ def do_copy(in_dir, out_dir, max_depth=None):
                 count += 1
 
             shutil.copy2(src_path, dst_path)
-
-        
+        if max_depth is not None and depth >= max_depth:
+            dirs.clear()
 
 
 in_dir = sys.argv[1]
