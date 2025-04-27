@@ -9,16 +9,15 @@ def do_copy(in_dir, out_dir, max_depth=None):
     os.makedirs(out_dir, exist_ok=True)
     names = {}
 
-    for root, dirs, files in os.walk(in_dir):
+    for root, folders, files in os.walk(in_dir):
         rel_path = os.path.relpath(root, in_dir)
         if rel_path == ".":
             depth = 0
         else:
-            rel_path.count(os.sep) + 1
+            depth = rel_path.count(os.sep) + 1
 
-        if max_depth is not None and depth > max_depth:
-            dirs[:] = []
-            continue
+        if max_depth is not None and depth >= max_depth:
+            folders.clear()
 
         dst_dir = os.path.join(out_dir, rel_path)
         os.makedirs(dst_dir, exist_ok=True)
