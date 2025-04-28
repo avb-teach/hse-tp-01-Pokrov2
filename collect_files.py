@@ -13,16 +13,19 @@ os.makedirs(output_directory, exist_ok=True)
 
 for curr_dir, folder, name in os.walk(input_directory):
     rel_path = os.path.relpath(curr_dir, input_directory)
+    if rel_path == '.':
+        path_components = []
+    else:
+        path_components = rel_path.split(os.sep)
 
-    path_components = rel_path.split(os.sep)
     if rel_path != '.':
         depth = len(path_components)  
     else: depth = 0
     if max_depth is not None and depth > max_depth:
         folder.clear()
         continue
-    if max_depth is not None and len(path_components) > max_depth:
-        start_index = len(path_components) - max_depth
+    if max_depth is not None:
+        start_index = max(0, len(path_components) - max_depth)
         list_of_folders = path_components[start_index:]
     else:
         list_of_folders = path_components
