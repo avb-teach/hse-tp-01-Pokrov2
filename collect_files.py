@@ -5,7 +5,7 @@ import shutil
 input_directory = sys.argv[1]
 output_directory = sys.argv[2]
 
-max_depth = 0
+max_depth = 1
 if len(sys.argv) >= 4:
     max_depth = int(sys.argv[3]) - 1
 
@@ -19,12 +19,12 @@ for curr_dir, folder, name in os.walk(input_directory):
     else:
         depth = rel_path.count(os.sep) + 1
 
-    if max_depth is not None and depth > max_depth:
+    if max_depth != 1 and depth > max_depth:
         folder.clear()
         continue
 
     list_of_folders = []
-    if max_depth is not None:
+    if max_depth != 1:
         list_of_folders = rel_path.split(os.sep)[:max_depth]
     else:
         list_of_folders = rel_path.split(os.sep)
@@ -51,4 +51,4 @@ for curr_dir, folder, name in os.walk(input_directory):
             target_file = os.path.join(last_folder, new_name)
             counter += 1
 
-        shutil.copy(path_to_prev_file, target_file)
+        shutil.copy2(path_to_prev_file, target_file)
