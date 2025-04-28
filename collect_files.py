@@ -2,44 +2,56 @@ import os
 import sys
 import shutil
 
-
-def do_copy(in_dir, out_dir, max_depth=None):
-    if not os.path.exists(in_dir):
-        sys.exit(1)
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-    names = {}
-    for curr_root, folders, files in os.walk(in_dir):
-        rel_path = os.path.relpath(curr_root, in_dir)
-        depth = 0 if rel_path == "." else rel_path.count(os.sep) + 1
-
-        if max_depth is not None and depth > max_depth:
-            folders[:] = []
-            continue
-
-        for f in files:
-            orig_path = os.path.join(curr_root, f)
-
-            if f in names:
-                names[f] += 1
-                dot = f.rfind(".")
-                if dot != -1:
-                    new_name = f[:dot] + f"_" + str(names[f]) + f[dot:]
-                else:
-                    new_name = f + "_" + str(names[f])
-            else:
-                names[f] = 1
-                new_name = f
-            final_path = os.path.join(out_dir, new_name)
-            shutil.copy2(orig_path, final_path)
-
-
-in_dir = sys.argv[1]
-out_dir = sys.argv[2]
+args = sys.argv[1:]
+input_directory = args[0]
+output_directory = args[1]
 max_depth = None
 
-if "--max_depth" in sys.argv:
-    idx = sys.argv.index("--max_depth")
-    max_depth = int(sys.argv[idx + 1])
+if "--max_depth" in args:
+    idx = args.index("--max_depth")
+    if idx + 1 < len(args):
+        max_depth = int(args[idx + 1])
 
-do_copy(in_dir, out_dir, max_depth)
+
+os.makedirs(output_directory, exist_ok=True)
+
+for curr_dir, folder, name in os.walk(input_directory):
+    rel_path = os.path.relpath(curr_dir, input_directory)
+    if rel_path == ".":
+        path_components = []
+    else:
+        path_components = rel_path.split(os.sep)
+
+    depth = len(path_components)
+
+    if max_depth is not None and depth > max_depth:
+        folder[:] = []
+        continue
+
+    if max_depth is not None:
+        list_of_folders = (
+            path_components[max(0, depth - max_depth) :]
+            if min(max_depth, depth) > 0
+            else []
+        )
+    else:
+        list_of_folders = path_components
+
+    if list_of_folders:
+        short_path = os.path.join(output_directory, *list_of_folders)
+    else:
+        short_path = output_directory
+
+    os.makedirs(short_path, exist_ok=True)
+
+    for filename in sorted(name):
+        src = os.path.join(curr_dir, filename)
+        base, ext = os.path.splitext(filename)
+        dst = os.path.join(short_path, filename)
+
+        counter = 1
+        while os.path.exists(dst):
+            dst = os.path.join(short_path, f"{base}_{counter}{ext}")
+            counter += 1
+
+        shutil.copy2(src, dst)
