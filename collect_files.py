@@ -7,7 +7,7 @@ output_directory = sys.argv[2]
 
 max_depth = None
 if len(sys.argv) > 3:
-    max_depth = int(sys.argv[3])
+    max_depth = int(sys.argv[4])
 
 os.makedirs(output_directory, exist_ok=True)
 
