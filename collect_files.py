@@ -29,8 +29,11 @@ for curr_dir, folder, name in os.walk(input_directory):
         continue
 
     if max_depth is not None:
-        start_index = max(0, depth - max_depth)
-        list_of_folders = path_components[-max_depth:]
+        list_of_folders = (
+            path_components[-min(max_depth, depth) :]
+            if min(max_depth, depth) > 0
+            else []
+        )
     else:
         list_of_folders = path_components
 
