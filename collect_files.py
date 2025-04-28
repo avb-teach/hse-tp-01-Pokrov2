@@ -17,7 +17,7 @@ for curr_dir, folder, name in os.walk(input_directory):
     if rel_path == ".":
         depth = 0
     else:
-        depth = rel_path.count(os.sep)
+        depth = rel_path.count(os.sep)+1
 
     if max_depth is not None and depth > max_depth:
         folder.clear()
