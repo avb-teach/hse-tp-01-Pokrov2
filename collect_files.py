@@ -9,7 +9,7 @@ max_depth = None
 
 if "--max_depth" in args:
     idx = args.index("--max_depth")
-    if idx + 1 <= len(args):
+    if idx + 1 < len(args):
         max_depth = int(args[idx + 1])
 
 
@@ -30,7 +30,7 @@ for curr_dir, folder, name in os.walk(input_directory):
 
     if max_depth is not None:
         start_index = max(0, depth - max_depth)
-        list_of_folders = path_components[start_index:]
+        list_of_folders = path_components[-max_depth:]
     else:
         list_of_folders = path_components
 
